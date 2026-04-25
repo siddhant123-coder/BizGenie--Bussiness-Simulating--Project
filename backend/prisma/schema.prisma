@@ -1,0 +1,56 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String        @id @default(uuid())
+  name         String
+  email        String        @unique
+  passwordHash String        @map("password_hash")
+  refreshToken String?       @map("refresh_token")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  lastLogin    DateTime?     @map("last_login")
+  sessions     GameSession[]
+
+  @@map("users")
+}
+
+model GameSession {
+  id              String           @id @default(uuid())
+  userId          String           @map("user_id")
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  businessType    String           @map("business_type")
+  businessLabel   String           @map("business_label")
+  businessEmoji   String           @map("business_emoji")
+  finalCash       Int              @map("final_cash")
+  score           Int
+  correctCount    Int              @map("correct_count")
+  totalAnswered   Int              @map("total_answered")
+  maxStreak       Int              @map("max_streak")
+  accuracyPct     Int              @map("accuracy_pct")
+  grade           String
+  journal         Json
+  conceptsLearned Json             @map("concepts_learned")
+  completedAt     DateTime         @default(now()) @map("completed_at")
+  answers         ScenarioAnswer[]
+
+  @@map("game_sessions")
+}
+
+model ScenarioAnswer {
+  id            String      @id @default(uuid())
+  sessionId     String      @map("session_id")
+  session       GameSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  scenarioIndex Int         @map("scenario_index")
+  choiceIndex   Int         @map("choice_index")
+  isCorrect     Boolean     @map("is_correct")
+  moneyDelta    Int         @map("money_delta")
+  answeredAt    DateTime    @default(now()) @map("answered_at")
+
+  @@map("scenario_answers")
+}
