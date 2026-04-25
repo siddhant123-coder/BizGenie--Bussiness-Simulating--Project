@@ -50,6 +50,9 @@ app.use(express.urlencoded({ extended: false }))
 app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'))
 
 // ── Routes ────────────────────────────────────────────────────────────────────
+app.get("/", (req, res) => {
+  res.send("API is running 🚀");
+});
 app.use('/api/auth', authLimiter, authRoutes)
 app.use('/api/game', gameRoutes)
 app.use('/api/leaderboard', leaderboardRoutes)
